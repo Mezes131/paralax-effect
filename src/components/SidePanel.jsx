@@ -77,7 +77,11 @@ const SidePanel = ({
                 <FontAwesomeIcon icon={faGamepad} />
                 Controls
               </h3>
-              {children?.controls || <p>Control settings will appear here.</p>}
+              {children?.controls || 
+                <div className="control-settings">
+                  <p>Control settings will appear here.</p>
+                </div>
+              }
             </div>
           )}
           

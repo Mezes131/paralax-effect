@@ -25,7 +25,7 @@
 
 .canvas-container {
   position: relative;
-  width: 100%;
+  width: 80%;
   max-width: 1200px;
   aspect-ratio: 16 / 9;
   max-height: 80vh;
@@ -66,12 +66,24 @@
   pointer-events: none;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 1s ease-out, transform 1s ease-out;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .canvas-overlay.loaded {
   opacity: 1;
   transform: translateY(0);
+}
+
+.canvas-overlay.loaded.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: none;
+}
+
+.canvas-overlay.loaded.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
 }
 
 .canvas-title {

@@ -82,8 +82,8 @@
 }
 
 .section-description {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.85rem;
+  color: #ffffff;
+  font-size: 0.9rem;
   line-height: 1.6;
   margin: 0 0 20px 0;
 }
@@ -224,15 +224,15 @@
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: rgba(255, 255, 0, 0.1);
+  background: rgba(0, 157, 255, 0.1);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 0, 0.2);
+  border: 1px solid rgba(0, 179, 255, 0.2);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .contact-item:hover {
-  background: rgba(255, 255, 0, 0.2);
+  background: rgba(0, 149, 255, 0.2);
   transform: translateX(5px);
 }
 
@@ -241,7 +241,7 @@
   width: 24px;
   text-align: center;
   color: #ffffff;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 0, 0.4));
+  filter: drop-shadow(0 0 6px rgba(0, 157, 255, 0.4));
 }
 
 .contact-item .fa-linkedin {
@@ -266,8 +266,8 @@
 }
 
 .contact-item a:hover {
-  color: #ffff00;
-  text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+  color: #00aaff;
+  text-shadow: 0 0 10px rgba(0, 153, 255, 0.5);
 }
 
 /* Footer Bottom */

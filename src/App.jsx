@@ -7,7 +7,7 @@ import { createCrystalsComposition } from './components/CrystalsComposition'
 import { createGalaxyComposition } from './components/GalaxyComposition'
 import { createAbstractComposition } from './components/AbstractComposition'
 import { createGiantBackground } from './components/GiantBackground'
-import Header from './components/Header'
+import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import SidePanel from './components/SidePanel'
 import {
@@ -35,6 +35,8 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isPanelExpanded, setIsPanelExpanded] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showCanvasText, setShowCanvasText] = useState(true)
+  const inactivityTimeoutRef = useRef(null)
 
   useEffect(() => {
     console.log('🔵 useEffect triggered')
@@ -194,9 +196,42 @@ function App() {
     handleResize()
     window.addEventListener('resize', handleResize)
 
-    // Gestion du mouvement de la souris
+    // Gestion du mouvement de la souris (global pour le parallaxe)
     const handleMouseMove = createMouseMoveHandler(targetMouseRef)
     window.addEventListener('mousemove', handleMouseMove)
+    
+    // Gestion de l'affichage du texte selon l'activité de la souris DANS LE CANVAS
+    const handleCanvasMouseActivity = () => {
+      // Masquer le texte quand la souris bouge dans le canvas
+      setShowCanvasText(false)
+      
+      // Réinitialiser le timer d'inactivité
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+      
+      // Réafficher le texte après 2 secondes d'inactivité
+      inactivityTimeoutRef.current = setTimeout(() => {
+        setShowCanvasText(true)
+      }, 2000)
+    }
+    
+    const handleCanvasMouseLeave = () => {
+      // Quand la souris quitte le canvas, réafficher le texte immédiatement
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+      setShowCanvasText(true)
+    }
+    
+    // Attacher les événements uniquement au canvas
+    const canvas = renderer.domElement
+    canvas.addEventListener('mousemove', handleCanvasMouseActivity)
+    canvas.addEventListener('mouseleave', handleCanvasMouseLeave)
+    
+    // Stocker les références pour le cleanup
+    const canvasMouseMoveHandler = handleCanvasMouseActivity
+    const canvasMouseLeaveHandler = handleCanvasMouseLeave
 
     // Animation loop avec deltaTime
     let lastTime = Date.now()
@@ -248,6 +283,16 @@ function App() {
       
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('mousemove', handleMouseMove)
+      
+      // Retirer les événements du canvas
+      if (renderer && renderer.domElement) {
+        renderer.domElement.removeEventListener('mousemove', canvasMouseMoveHandler)
+        renderer.domElement.removeEventListener('mouseleave', canvasMouseLeaveHandler)
+      }
+      
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
       console.log('✅ Event listeners removed')
       
       if (animationFrameRef.current) {
@@ -310,6 +355,22 @@ function App() {
     }
   }, [])
 
+  // Initialiser le timer d'inactivité au chargement
+  useEffect(() => {
+    if (isLoaded) {
+      // Réafficher le texte après 2 secondes si pas de mouvement
+      inactivityTimeoutRef.current = setTimeout(() => {
+        setShowCanvasText(true)
+      }, 2000)
+    }
+
+    return () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current)
+      }
+    }
+  }, [isLoaded])
+
   const handleTogglePanel = () => {
     setIsPanelExpanded(!isPanelExpanded)
   }
@@ -318,6 +379,18 @@ function App() {
     const newFullscreen = !isFullscreen
     setIsFullscreen(newFullscreen)
     isFullscreenRef.current = newFullscreen
+    
+    // Réinitialiser le timer d'inactivité lors du changement de mode
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current)
+    }
+    
+    // Si on sort du mode plein écran, réafficher le texte après 5 secondes
+    
+    inactivityTimeoutRef.current = setTimeout(() => {
+      setShowCanvasText(true)
+    }, 2000)
+    
     
     // Mettre à jour la taille du renderer
     if (rendererRef.current && cameraRef.current) {
@@ -347,12 +420,12 @@ function App() {
 
   return (
     <div className={`app-container ${isFullscreen ? 'fullscreen' : ''}`}>
-      {!isFullscreen && <Header isLoaded={isLoaded} />}
+      {!isFullscreen && <NavBar isLoaded={isLoaded} />}
       
       <div className="canvas-wrapper">
         <div ref={mountRef} className={`canvas-container ${isFullscreen ? 'fullscreen' : ''}`}>
-          {!isFullscreen && (
-            <div className={`canvas-overlay ${isLoaded ? 'loaded' : ''}`}>
+          { (
+            <div className={`canvas-overlay ${isLoaded ? 'loaded' : ''} ${showCanvasText ? 'visible' : 'hidden'}`}>
               <h1 className="canvas-title">PARALLAX EXPERIENCE</h1>
               <p className="canvas-subtitle">Move your mouse to explore</p>
             </div>
@@ -372,6 +445,7 @@ function App() {
           controls: (
             <div>
               <p>Adjust parallax intensity and animation speed here.</p>
+              <p>This feature will be available soon...</p>
             </div>
           ),
           info: (

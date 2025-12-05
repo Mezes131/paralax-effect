@@ -1,7 +1,7 @@
 .side-panel {
   position: fixed;
-  top: 50%;
-  right: 0;
+  top: calc(50% + 2.2rem);
+  right: -60px;
   transform: translateY(-50%);
   width: 60px;
   height: 100%;
@@ -20,12 +20,12 @@
 
 .side-panel.expanded {
   width: 350px;
+  right: 0;
 }
 
 .side-panel.fullscreen {
   border-radius: 0;
   top: 0;
-  right: 0;
   transform: none;
   height: 100vh;
   max-height: 100vh;
@@ -33,7 +33,7 @@
 }
 
 .side-panel.fullscreen.expanded {
-  width: 400px;
+  width: 350px;
 }
 
 /* Button container on the edge */
