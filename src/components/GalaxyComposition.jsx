@@ -10,14 +10,17 @@ export function createGalaxyComposition(scene, objectsRef) {
     const galaxyGroup = new THREE.Group()
     galaxyGroup.userData = { type: 'galaxy', speed: 0.1 }
   
-  // Centre - Icosahedron géant
+  // Centre - Icosahedron géant en verre avec émission jaune légère
   const icoGeometry = new THREE.IcosahedronGeometry(1.5, 0)
-  const icoMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffff00,
-    metalness: 0.9,
-    roughness: 0.1,
+  const icoMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transmission: 0.95,
+    opacity: 0.9,
+    transparent: true,
+    metalness: 0.1,
+    roughness: 0.2,
     emissive: 0xffff00,
-    emissiveIntensity: 0.4
+    emissiveIntensity: 0.2
   })
   const ico = new THREE.Mesh(icoGeometry, icoMaterial)
   ico.position.set(0, 0, 0)
@@ -30,19 +33,20 @@ export function createGalaxyComposition(scene, objectsRef) {
   galaxyGroup.add(ico)
   objectsRef.current.push(ico)
   
-  galaxyGroup.position.set(0, 0, 5)
+  galaxyGroup.position.set(-4, -3, 8)
   
-  // Particules flottantes
-  const particleCount = 50
+  // Particules flottantes - moins nombreuses et mieux réparties
+  const particleCount = 30
   const particlesGeometry = new THREE.BufferGeometry()
   const positions = new Float32Array(particleCount * 3)
   const colors = new Float32Array(particleCount * 3)
   
   for (let i = 0; i < particleCount; i++) {
     const i3 = i * 3
-    positions[i3] = (Math.random() - 0.5) * 20
-    positions[i3 + 1] = (Math.random() - 0.5) * 20
-    positions[i3 + 2] = (Math.random() - 0.5) * 20 + 5
+    // Zone plus large mais moins dense
+    positions[i3] = (Math.random() - 0.5) * 25
+    positions[i3 + 1] = (Math.random() - 0.5) * 25
+    positions[i3 + 2] = (Math.random() - 0.5) * 25 + 8
     
     const color = new THREE.Color().setHSL(Math.random(), 1, 0.5)
     colors[i3] = color.r

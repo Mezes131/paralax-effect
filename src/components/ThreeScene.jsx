@@ -6,7 +6,9 @@ import { createCrystalsComposition } from './CrystalsComposition'
 import { createGalaxyComposition } from './GalaxyComposition'
 import { createAbstractComposition } from './AbstractComposition'
 import { createGiantBackground } from './GiantBackground'
+import { createStarFieldComposition } from './StarFieldComposition'
 import {
+  lerp,
   createMouseMoveHandler,
   updateMousePosition,
   applyParallaxToGroups,
@@ -29,6 +31,18 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
   const isInitializedRef = useRef(false)
   const isFullscreenRef = useRef(false)
   const inactivityTimeoutRef = useRef(null)
+  
+  // Références pour les contrôles de navigation 3D
+  const isRotatingRef = useRef(false)
+  const isPanningRef = useRef(false)
+  const previousMousePositionRef = useRef({ x: 0, y: 0 })
+  const cameraRotationRef = useRef({ x: 0, y: 0 })
+  const targetCameraRotationRef = useRef({ x: 0, y: 0 })
+  const cameraPositionRef = useRef({ x: 0, y: 0, z: 8 })
+  const targetCameraPositionRef = useRef({ x: 0, y: 0, z: 8 })
+  const scenePositionRef = useRef({ x: 0, y: 0, z: 0 })
+  const targetScenePositionRef = useRef({ x: 0, y: 0, z: 0 })
+  const sceneContainerRef = useRef(null)
 
   // Exposer les méthodes nécessaires au parent via ref
   useImperativeHandle(ref, () => ({
@@ -185,6 +199,16 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
     // Scène
     const scene = new THREE.Scene()
     sceneRef.current = scene
+    
+    // Créer un groupe conteneur pour toute la scène (pour le pan)
+    const sceneContainer = new THREE.Group()
+    sceneContainerRef.current = sceneContainer
+    scene.add(sceneContainer)
+    
+    // Initialiser la position de la scène
+    scenePositionRef.current = { x: 0, y: 0, z: 0 }
+    targetScenePositionRef.current = { x: 0, y: 0, z: 0 }
+    
     console.log('✅ Scene created')
 
     // Caméra
@@ -196,6 +220,13 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
     )
     camera.position.z = 8
     cameraRef.current = camera
+    
+    // Initialiser les positions de caméra
+    cameraPositionRef.current = { x: 0, y: 0, z: 8 }
+    targetCameraPositionRef.current = { x: 0, y: 0, z: 8 }
+    cameraRotationRef.current = { x: 0, y: 0 }
+    targetCameraRotationRef.current = { x: 0, y: 0 }
+    
     console.log('✅ Camera created')
 
     // Renderer avec ombres
@@ -229,32 +260,42 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
     // ========== ÉCLAIRAGE DRAMATIQUE ==========
     createLighting(scene, lightsRef)
 
+    // ========== CIEL ÉTOILÉ (en premier pour être en arrière-plan) ==========
+    const starFieldGroup = createStarFieldComposition(sceneContainer, objectsRef)
+    if (starFieldGroup) {
+      groupsRef.current.push(starFieldGroup)
+    }
+
     // ========== COMPOSITION 1: "PORTAL" ==========
-    const portalGroup = createPortalComposition(scene, objectsRef)
+    const portalGroup = createPortalComposition(sceneContainer, objectsRef)
     if (portalGroup) {
       groupsRef.current.push(portalGroup)
     }
 
     // ========== COMPOSITION 2: "CRISTAUX" ==========
-    const crystalGroup = createCrystalsComposition(scene, objectsRef)
+    const crystalGroup = createCrystalsComposition(sceneContainer, objectsRef)
     if (crystalGroup) {
       groupsRef.current.push(crystalGroup)
     }
 
     // ========== COMPOSITION 3: "GALAXY" ==========
-    const galaxyGroup = createGalaxyComposition(scene, objectsRef)
+    const galaxyGroup = createGalaxyComposition(sceneContainer, objectsRef)
     if (galaxyGroup) {
       groupsRef.current.push(galaxyGroup)
     }
 
     // ========== COMPOSITION 4: "ABSTRACT" ==========
-    const abstractGroup = createAbstractComposition(scene, objectsRef)
+    const abstractGroup = createAbstractComposition(sceneContainer, objectsRef)
     if (abstractGroup) {
       groupsRef.current.push(abstractGroup)
     }
+    
+    // Positions des groupes dans l'espace 3D (X, Y, Z) - mieux espacées :
+    // - Portal: (4, 2, -6) - droite, haut, avant-plan
+    // - Crystals: (-3, -2, 2) - gauche, bas, premier plan
+    // - Galaxy: (-4, -3, 8) - gauche, bas, arrière-plan
+    // - Abstract: (-5, 3, -10) - gauche, haut, très arrière-plan
 
-    // ========== OBJET GÉANT EN FOND ==========
-    createGiantBackground(scene, objectsRef)
 
     console.log(`✅ Total objects created: ${objectsRef.current.length}`)
     console.log(`📊 Scene children count: ${scene.children.length}`)
@@ -330,9 +371,115 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
     canvas.addEventListener('mousemove', handleCanvasMouseActivity)
     canvas.addEventListener('mouseleave', handleCanvasMouseLeave)
     
+    // ========== CONTRÔLES DE NAVIGATION 3D ==========
+    
+    // Zoom avec la molette
+    const handleWheel = (event) => {
+      event.preventDefault()
+      const zoomSpeed = 0.1
+      const delta = event.deltaY * zoomSpeed
+      
+      // Calculer la direction de la caméra
+      const direction = new THREE.Vector3()
+      camera.getWorldDirection(direction)
+      
+      // Zoom en déplaçant la caméra le long de sa direction
+      const zoomAmount = delta * zoomSpeed
+      targetCameraPositionRef.current.z = Math.max(2, Math.min(60, targetCameraPositionRef.current.z - zoomAmount))
+    }
+    
+    // Rotation avec clic gauche (drag)
+    const handleMouseDown = (event) => {
+      if (event.button === 0) { // Clic gauche
+        isRotatingRef.current = true
+        previousMousePositionRef.current = {
+          x: event.clientX,
+          y: event.clientY
+        }
+        canvas.style.cursor = 'grabbing'
+      } else if (event.button === 2) { // Clic droit
+        isPanningRef.current = true
+        previousMousePositionRef.current = {
+          x: event.clientX,
+          y: event.clientY
+        }
+        canvas.style.cursor = 'move'
+      }
+    }
+    
+    const handleNavigationMouseMove = (event) => {
+      if (isRotatingRef.current) {
+        // Rotation de la caméra
+        const deltaX = event.clientX - previousMousePositionRef.current.x
+        const deltaY = event.clientY - previousMousePositionRef.current.y
+        
+        const rotationSpeed = 0.005
+        targetCameraRotationRef.current.y += deltaX * rotationSpeed
+        targetCameraRotationRef.current.x += deltaY * rotationSpeed
+        
+        // Limiter la rotation verticale pour éviter les inversions
+        targetCameraRotationRef.current.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, targetCameraRotationRef.current.x))
+        
+        previousMousePositionRef.current = {
+          x: event.clientX,
+          y: event.clientY
+        }
+      } else if (isPanningRef.current) {
+        // Déplacement (pan) de la scène
+        const deltaX = event.clientX - previousMousePositionRef.current.x
+        const deltaY = event.clientY - previousMousePositionRef.current.y
+        
+        const panSpeed = 0.005
+        // Calculer les vecteurs de déplacement dans l'espace de la caméra
+        const right = new THREE.Vector3()
+        right.setFromMatrixColumn(camera.matrixWorld, 0)
+        right.normalize()
+        
+        const up = new THREE.Vector3()
+        up.setFromMatrixColumn(camera.matrixWorld, 1)
+        up.normalize()
+        
+        // Déplacer la scène perpendiculairement à la direction de la caméra
+        const panVector = new THREE.Vector3()
+        panVector.addScaledVector(right, -deltaX * panSpeed)
+        panVector.addScaledVector(up, deltaY * panSpeed)
+        
+        targetScenePositionRef.current.x += panVector.x
+        targetScenePositionRef.current.y += panVector.y
+        
+        previousMousePositionRef.current = {
+          x: event.clientX,
+          y: event.clientY
+        }
+      }
+    }
+    
+    const handleMouseUp = () => {
+      isRotatingRef.current = false
+      isPanningRef.current = false
+      canvas.style.cursor = 'default'
+    }
+    
+    // Empêcher le menu contextuel sur clic droit
+    const handleContextMenu = (event) => {
+      event.preventDefault()
+    }
+    
+    // Ajouter les event listeners pour la navigation
+    canvas.addEventListener('wheel', handleWheel, { passive: false })
+    canvas.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mousemove', handleNavigationMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    canvas.addEventListener('contextmenu', handleContextMenu)
+    
     // Stocker les références pour le cleanup
     const canvasMouseMoveHandler = handleCanvasMouseActivity
     const canvasMouseLeaveHandler = handleCanvasMouseLeave
+    const wheelHandler = handleWheel
+    const mouseDownHandler = handleMouseDown
+    const navigationMouseMoveHandler = handleNavigationMouseMove
+    const mouseUpHandler = handleMouseUp
+    const contextMenuHandler = handleContextMenu
 
     // Animation loop avec deltaTime
     let lastTime = Date.now()
@@ -347,8 +494,46 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
       // Mettre à jour la position de la souris avec interpolation fluide
       updateMousePosition(mouseRef, targetMouseRef)
 
-      // Appliquer le parallaxe aux groupes
-      applyParallaxToGroups(groupsRef, mouseRef)
+      // Interpolation fluide de la rotation de la caméra
+      const rotationLerpFactor = 0.1
+      cameraRotationRef.current.x = lerp(cameraRotationRef.current.x, targetCameraRotationRef.current.x, rotationLerpFactor)
+      cameraRotationRef.current.y = lerp(cameraRotationRef.current.y, targetCameraRotationRef.current.y, rotationLerpFactor)
+      
+      // Interpolation fluide de la position de la caméra
+      const positionLerpFactor = 0.1
+      cameraPositionRef.current.z = lerp(cameraPositionRef.current.z, targetCameraPositionRef.current.z, positionLerpFactor)
+      
+      // Interpolation fluide de la position de la scène (pour le pan)
+      const scenePositionLerpFactor = 0.1
+      scenePositionRef.current.x = lerp(scenePositionRef.current.x, targetScenePositionRef.current.x, scenePositionLerpFactor)
+      scenePositionRef.current.y = lerp(scenePositionRef.current.y, targetScenePositionRef.current.y, scenePositionLerpFactor)
+      
+      // Appliquer la rotation à la caméra (coordonnées sphériques)
+      const spherical = new THREE.Spherical()
+      spherical.radius = cameraPositionRef.current.z
+      spherical.phi = Math.PI / 2 - cameraRotationRef.current.x // Inclinaison verticale
+      spherical.theta = cameraRotationRef.current.y // Rotation horizontale
+      
+      // Position de la caméra en coordonnées sphériques
+      const cameraPos = new THREE.Vector3()
+      cameraPos.setFromSpherical(spherical)
+      
+      camera.position.copy(cameraPos)
+      
+      // Faire regarder la caméra vers le centre
+      camera.lookAt(0, 0, 0)
+      
+      // Appliquer le déplacement à la scène (pan)
+      if (sceneContainerRef.current) {
+        sceneContainerRef.current.position.x = scenePositionRef.current.x
+        sceneContainerRef.current.position.y = scenePositionRef.current.y
+        sceneContainerRef.current.position.z = scenePositionRef.current.z
+      }
+
+      // Appliquer le parallaxe aux groupes (seulement si pas de navigation active)
+      if (!isRotatingRef.current && !isPanningRef.current) {
+        applyParallaxToGroups(groupsRef, mouseRef)
+      }
       
       // Appliquer le parallaxe et animations aux objets
       applyParallaxToObjects(objectsRef, mouseRef, deltaTime)
@@ -387,7 +572,14 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange 
       if (renderer && renderer.domElement) {
         renderer.domElement.removeEventListener('mousemove', canvasMouseMoveHandler)
         renderer.domElement.removeEventListener('mouseleave', canvasMouseLeaveHandler)
+        renderer.domElement.removeEventListener('wheel', wheelHandler)
+        renderer.domElement.removeEventListener('mousedown', mouseDownHandler)
+        renderer.domElement.removeEventListener('contextmenu', contextMenuHandler)
       }
+      
+      // Retirer les événements globaux de navigation
+      window.removeEventListener('mousemove', navigationMouseMoveHandler)
+      window.removeEventListener('mouseup', mouseUpHandler)
       
       if (inactivityTimeoutRef.current) {
         clearTimeout(inactivityTimeoutRef.current)
