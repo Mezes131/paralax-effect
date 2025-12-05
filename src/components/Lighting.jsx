@@ -40,7 +40,6 @@ export function createLighting(scene, lightsRef) {
   scene.add(rimLight)
 
     lightsRef.current = [pointLight1, pointLight2, pointLight3, spotLight, rimLight]
-    console.log('✅ Lights created')
     
     return lightsRef.current
   } catch (error) {

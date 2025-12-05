@@ -70,7 +70,6 @@ export function createGalaxyComposition(scene, objectsRef) {
   
     scene.add(galaxyGroup)
     
-    console.log('✅ Galaxy composition created')
     return galaxyGroup
   } catch (error) {
     console.error('❌ Error creating galaxy composition:', error)

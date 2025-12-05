@@ -84,7 +84,6 @@ export function createStarFieldComposition(scene, objectsRef) {
     
     scene.add(starFieldGroup)
     
-    console.log(`✅ Star field created with ${starCount} stars`)
     return starFieldGroup
   } catch (error) {
     console.error('❌ Error creating star field:', error)

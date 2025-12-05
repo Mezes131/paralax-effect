@@ -117,7 +117,6 @@ export function createPortalComposition(scene, objectsRef) {
     portalGroup.position.set(4, 2, -6)
     scene.add(portalGroup)
     
-    console.log('✅ Portal composition created')
     return portalGroup
   } catch (error) {
     console.error('❌ Error creating portal composition:', error)

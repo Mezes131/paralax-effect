@@ -11,6 +11,7 @@ function App() {
   const [isPanelExpanded, setIsPanelExpanded] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showCanvasText, setShowCanvasText] = useState(true)
+  const [isTourActive, setIsTourActive] = useState(false)
   const inactivityTimeoutRef = useRef(null)
 
 
@@ -48,8 +49,9 @@ function App() {
             isFullscreen={isFullscreen}
             onLoaded={setIsLoaded}
             onShowCanvasTextChange={setShowCanvasText}
+            onTourStateChange={setIsTourActive}
           />
-          <div className={`canvas-overlay ${isLoaded ? 'loaded' : ''} ${showCanvasText ? 'visible' : 'hidden'}`}>
+          <div className={`canvas-overlay ${isLoaded ? 'loaded' : ''} ${showCanvasText && !isTourActive ? 'visible' : 'hidden'}`}>
             <h1 className="canvas-title">PARALLAX EXPERIENCE</h1>
             <p className="canvas-subtitle">Move your mouse to explore</p>
           </div>

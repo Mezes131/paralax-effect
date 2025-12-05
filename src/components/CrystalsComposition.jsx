@@ -49,7 +49,6 @@ export function createCrystalsComposition(scene, objectsRef) {
   
     scene.add(crystalGroup)
     
-    console.log('✅ Crystals composition created')
     return crystalGroup
   } catch (error) {
     console.error('❌ Error creating crystals composition:', error)

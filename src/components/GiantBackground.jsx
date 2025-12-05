@@ -25,7 +25,6 @@ export function createGiantBackground(scene, objectsRef) {
     scene.add(giantBox)
     objectsRef.current.push(giantBox)
     
-    console.log('✅ Giant background created')
     return giantBox
   } catch (error) {
     console.error('❌ Error creating giant background:', error)

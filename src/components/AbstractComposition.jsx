@@ -16,7 +16,6 @@ export function createAbstractComposition(scene, objectsRef) {
     
     scene.add(abstractGroup)
     
-    console.log('✅ Abstract composition created')
     return abstractGroup
   } catch (error) {
     console.error('❌ Error creating abstract composition:', error)
