@@ -482,7 +482,11 @@ function App() {
     })
     const giantBox = new THREE.Mesh(giantGeometry, giantMaterial)
     giantBox.position.set(0, 0, -15)
-    giantBox.userData = { type: 'giant-background', speed: 0.05, rotationSpeed: 0.001 }
+    giantBox.userData = { 
+      type: 'giant-background', 
+      speed: 0.05, 
+      rotationSpeed: 0.001
+     }
     scene.add(giantBox)
     objectsRef.current.push(giantBox)
     console.log('✅ Giant background created')
