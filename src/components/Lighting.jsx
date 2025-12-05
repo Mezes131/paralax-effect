@@ -1,9 +1,15 @@
 import * as THREE from 'three'
 
 export function createLighting(scene, lightsRef) {
-  // Lumière ambiante douce
-  const ambientLight = new THREE.AmbientLight(0x404040, 0.3)
-  scene.add(ambientLight)
+  if (!scene || !lightsRef) {
+    console.error('❌ createLighting: scene and lightsRef are required')
+    return []
+  }
+
+  try {
+    // Lumière ambiante douce
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.3)
+    scene.add(ambientLight)
 
   // PointLights colorées en mouvement
   const pointLight1 = new THREE.PointLight(0xff00ff, 3, 100)
@@ -33,9 +39,14 @@ export function createLighting(scene, lightsRef) {
   rimLight.position.set(0, 0, -20)
   scene.add(rimLight)
 
-  lightsRef.current = [pointLight1, pointLight2, pointLight3, spotLight, rimLight]
-  console.log('✅ Lights created')
-  
-  return lightsRef.current
+    lightsRef.current = [pointLight1, pointLight2, pointLight3, spotLight, rimLight]
+    console.log('✅ Lights created')
+    
+    return lightsRef.current
+  } catch (error) {
+    console.error('❌ Error creating lighting:', error)
+    lightsRef.current = []
+    return []
+  }
 }
 

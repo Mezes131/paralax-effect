@@ -1,8 +1,14 @@
 import * as THREE from 'three'
 
 export function createPortalComposition(scene, objectsRef) {
-  const portalGroup = new THREE.Group()
-  portalGroup.userData = { type: 'portal', speed: 0.3 }
+  if (!scene || !objectsRef) {
+    console.error('❌ createPortalComposition: scene and objectsRef are required')
+    return null
+  }
+
+  try {
+    const portalGroup = new THREE.Group()
+    portalGroup.userData = { type: 'portal', speed: 0.3 }
   
   // Anneau extérieur - Métal brossé cyan
   const outerRingGeometry = new THREE.TorusGeometry(2.2, 0.4, 32, 100)
@@ -106,10 +112,14 @@ export function createPortalComposition(scene, objectsRef) {
     objectsRef.current.push(sphere)
   }
   
-  portalGroup.position.set(0, 0, -5)
-  scene.add(portalGroup)
-  
-  console.log('✅ Portal composition created')
-  return portalGroup
+    portalGroup.position.set(0, 0, -5)
+    scene.add(portalGroup)
+    
+    console.log('✅ Portal composition created')
+    return portalGroup
+  } catch (error) {
+    console.error('❌ Error creating portal composition:', error)
+    return null
+  }
 }
 

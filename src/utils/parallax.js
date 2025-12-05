@@ -43,16 +43,19 @@ export function applyParallaxToGroups(groupsRef, mouseRef) {
  * @param {number} deltaTime - Temps écoulé depuis la dernière frame (en secondes)
  */
 export function applyParallaxToObjects(objectsRef, mouseRef, deltaTime) {
+  // Protection contre les gros deltaTime (onglet inactif, pause, etc.)
+  const clampedDeltaTime = Math.min(deltaTime, 0.1) // Limiter à 100ms max
+  
   objectsRef.current.forEach((object) => {
     if (!object || !object.userData) return
     
     const { speed, rotationSpeed, angle, orbitSpeed, orbitRadius, type, originalPosition } = object.userData
     
-    // Rotation continue
+    // Rotation continue - utiliser le deltaTime réel sans normalisation
     if (rotationSpeed) {
-      object.rotation.x += rotationSpeed * deltaTime * 60 // Normaliser à 60 FPS
-      object.rotation.y += rotationSpeed * 0.7 * deltaTime * 60
-      object.rotation.z += rotationSpeed * 0.3 * deltaTime * 60
+      object.rotation.x += rotationSpeed * clampedDeltaTime
+      object.rotation.y += rotationSpeed * 0.7 * clampedDeltaTime
+      object.rotation.z += rotationSpeed * 0.3 * clampedDeltaTime
     }
     
     // Orbite pour les objets en orbite
@@ -62,7 +65,7 @@ export function applyParallaxToObjects(objectsRef, mouseRef, deltaTime) {
       const currentAngle = object.userData.currentAngle !== undefined 
         ? object.userData.currentAngle 
         : angle
-      const newAngle = currentAngle + orbitSpeed * deltaTime * 60 // Normaliser à 60 FPS
+      const newAngle = currentAngle + orbitSpeed * clampedDeltaTime
       object.userData.currentAngle = newAngle
       
       if (originalPosition) {
@@ -87,11 +90,16 @@ export function applyParallaxToObjects(objectsRef, mouseRef, deltaTime) {
 /**
  * Applique la rotation continue aux groupes
  * @param {Array} groupsRef - Référence contenant les groupes Three.js
+ * @param {number} deltaTime - Temps écoulé depuis la dernière frame (en secondes)
  */
-export function rotateGroups(groupsRef) {
+export function rotateGroups(groupsRef, deltaTime = 0.016) {
+  // Protection contre les gros deltaTime
+  const clampedDeltaTime = Math.min(deltaTime, 0.1)
+  const rotationSpeed = 0.002 * 60 // Vitesse de rotation par seconde
+  
   groupsRef.current.forEach((group) => {
     if (group && group.userData) {
-      group.rotation.y += 0.002
+      group.rotation.y += rotationSpeed * clampedDeltaTime
     }
   })
 }

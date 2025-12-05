@@ -1,8 +1,14 @@
 import * as THREE from 'three'
 
 export function createAbstractComposition(scene, objectsRef) {
-  const abstractGroup = new THREE.Group()
-  abstractGroup.userData = { type: 'abstract', speed: 0.25 }
+  if (!scene || !objectsRef) {
+    console.error('❌ createAbstractComposition: scene and objectsRef are required')
+    return null
+  }
+
+  try {
+    const abstractGroup = new THREE.Group()
+    abstractGroup.userData = { type: 'abstract', speed: 0.25 }
   
   // Dodecahedron wireframe
   const dodecaGeometry = new THREE.DodecahedronGeometry(1, 0)
@@ -23,7 +29,8 @@ export function createAbstractComposition(scene, objectsRef) {
   abstractGroup.add(wireframeDodeca)
   objectsRef.current.push(wireframeDodeca)
   
-  // Dodecahedron solid offset
+  // Dodecahedron solid offset - Cloner la géométrie pour éviter les conflits de mémoire
+  const solidDodecaGeometry = dodecaGeometry.clone()
   const solidDodecaMat = new THREE.MeshStandardMaterial({
     color: 0xff0080,
     metalness: 0.9,
@@ -31,7 +38,7 @@ export function createAbstractComposition(scene, objectsRef) {
     emissive: 0xff0080,
     emissiveIntensity: 0.2
   })
-  const solidDodeca = new THREE.Mesh(dodecaGeometry, solidDodecaMat)
+  const solidDodeca = new THREE.Mesh(solidDodecaGeometry, solidDodecaMat)
   solidDodeca.position.set(-3.15, 0.15, -0.15)
   solidDodeca.userData = { 
     type: 'solid-dodeca', 
@@ -91,11 +98,15 @@ export function createAbstractComposition(scene, objectsRef) {
     objectsRef.current.push(innerSphere)
   }
   
-  abstractGroup.position.set(0, 0, -8)
-  
-  scene.add(abstractGroup)
-  
-  console.log('✅ Abstract composition created')
-  return abstractGroup
+    abstractGroup.position.set(0, 0, -8)
+    
+    scene.add(abstractGroup)
+    
+    console.log('✅ Abstract composition created')
+    return abstractGroup
+  } catch (error) {
+    console.error('❌ Error creating abstract composition:', error)
+    return null
+  }
 }
 

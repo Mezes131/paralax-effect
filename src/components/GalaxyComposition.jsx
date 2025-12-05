@@ -1,8 +1,14 @@
 import * as THREE from 'three'
 
 export function createGalaxyComposition(scene, objectsRef) {
-  const galaxyGroup = new THREE.Group()
-  galaxyGroup.userData = { type: 'galaxy', speed: 0.1 }
+  if (!scene || !objectsRef) {
+    console.error('❌ createGalaxyComposition: scene and objectsRef are required')
+    return null
+  }
+
+  try {
+    const galaxyGroup = new THREE.Group()
+    galaxyGroup.userData = { type: 'galaxy', speed: 0.1 }
   
   // Centre - Icosahedron géant
   const icoGeometry = new THREE.IcosahedronGeometry(1.5, 0)
@@ -58,9 +64,13 @@ export function createGalaxyComposition(scene, objectsRef) {
   galaxyGroup.add(particles)
   objectsRef.current.push(particles)
   
-  scene.add(galaxyGroup)
-  
-  console.log('✅ Galaxy composition created')
-  return galaxyGroup
+    scene.add(galaxyGroup)
+    
+    console.log('✅ Galaxy composition created')
+    return galaxyGroup
+  } catch (error) {
+    console.error('❌ Error creating galaxy composition:', error)
+    return null
+  }
 }
 

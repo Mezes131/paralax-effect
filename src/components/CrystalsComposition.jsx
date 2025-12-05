@@ -1,8 +1,14 @@
 import * as THREE from 'three'
 
 export function createCrystalsComposition(scene, objectsRef) {
-  const crystalGroup = new THREE.Group()
-  crystalGroup.userData = { type: 'crystals', speed: 0.2 }
+  if (!scene || !objectsRef) {
+    console.error('❌ createCrystalsComposition: scene and objectsRef are required')
+    return null
+  }
+
+  try {
+    const crystalGroup = new THREE.Group()
+    crystalGroup.userData = { type: 'crystals', speed: 0.2 }
   
   const crystalSizes = [1.2, 0.8, 0.6, 0.4, 0.3, 0.25, 0.2]
   const crystalPositions = [
@@ -38,9 +44,13 @@ export function createCrystalsComposition(scene, objectsRef) {
     objectsRef.current.push(crystal)
   })
   
-  scene.add(crystalGroup)
-  
-  console.log('✅ Crystals composition created')
-  return crystalGroup
+    scene.add(crystalGroup)
+    
+    console.log('✅ Crystals composition created')
+    return crystalGroup
+  } catch (error) {
+    console.error('❌ Error creating crystals composition:', error)
+    return null
+  }
 }
 
