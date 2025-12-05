@@ -341,14 +341,16 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange,
   }
 
   useEffect(() => {
+    // Capturer mountRef.current dans une variable locale pour le cleanup
+    const mountElement = mountRef.current
     
-    if (!mountRef.current) {
+    if (!mountElement) {
       console.warn('⚠️ mountRef.current is null, aborting initialization')
       return
     }
 
     // Vérifier si un canvas valide existe déjà dans le DOM
-    const existingCanvas = mountRef.current.querySelector('canvas')
+    const existingCanvas = mountElement.querySelector('canvas')
     if (existingCanvas && rendererRef.current && rendererRef.current.domElement === existingCanvas) {
       console.warn('⚠️ Valid canvas and renderer already exist, skipping initialization')
       console.warn(`   Scene exists: ${!!sceneRef.current}`)
@@ -369,9 +371,9 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange,
     if (isInitializedRef.current) {
       console.warn('⚠️ Already initialized, but proceeding with cleanup and reinit...')
       // Retirer le canvas du DOM avant cleanup
-      if (rendererRef.current && rendererRef.current.domElement && mountRef.current) {
-        if (mountRef.current.contains(rendererRef.current.domElement)) {
-          mountRef.current.removeChild(rendererRef.current.domElement)
+      if (rendererRef.current && rendererRef.current.domElement && mountElement) {
+        if (mountElement.contains(rendererRef.current.domElement)) {
+          mountElement.removeChild(rendererRef.current.domElement)
         }
       }
       // Nettoyer toutes les ressources Three.js
@@ -438,12 +440,12 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange,
     renderer.domElement.style.position = 'relative'
     renderer.domElement.style.borderRadius = '20px'
     
-    if (!mountRef.current) {
+    if (!mountElement) {
       isInitializedRef.current = false
       return
     }
     
-    mountRef.current.appendChild(renderer.domElement)
+    mountElement.appendChild(renderer.domElement)
     rendererRef.current = renderer
 
     // ========== ÉCLAIRAGE DRAMATIQUE ==========
@@ -909,9 +911,9 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange,
       }
 
       // Retirer le canvas du DOM
-      if (mountRef.current && renderer && renderer.domElement) {
-        if (mountRef.current.contains(renderer.domElement)) {
-          mountRef.current.removeChild(renderer.domElement)
+      if (mountElement && renderer && renderer.domElement) {
+        if (mountElement.contains(renderer.domElement)) {
+          mountElement.removeChild(renderer.domElement)
         }
       }
 
@@ -928,7 +930,7 @@ const ThreeScene = forwardRef(({ isFullscreen, onLoaded, onShowCanvasTextChange,
       // car tout est nettoyé
       isInitializedRef.current = false
     }
-  }, [onLoaded, onShowCanvasTextChange])
+  }, [onLoaded, onShowCanvasTextChange, onTourStateChange])
 
   // Initialiser le timer d'inactivité au chargement
   useEffect(() => {

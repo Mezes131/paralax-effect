@@ -46,29 +46,10 @@ export function createGuidedTour(scene, spacecraftRef, cameraRef, onTourComplete
   const cameraLookAtLerpSpeed = 0.15 // Vitesse d'interpolation du lookAt de la caméra
   const cameraPositionLerpSpeed = 0.12 // Vitesse d'interpolation de la position de la caméra
 
-  /**
-   * Calcule une trajectoire courbe entre deux points (spline Catmull-Rom)
-   */
-  function createSplinePath(start, end, controlPoint1, controlPoint2) {
-    const points = [start, controlPoint1, controlPoint2, end]
-    const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal')
-    return curve
-  }
-
-  /**
-   * Interpolation linéaire entre deux vecteurs
-   */
-  function lerpVector(start, end, t) {
-    return start.clone().lerp(end, t)
-  }
-
-  /**
-   * Fonction d'easing pour transitions fluides (ease-in-out)
-   */
-  function easeInOut(t) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
-  }
   
+ 
+
+
   /**
    * Fonction d'easing plus douce (ease-in-out-cubic) pour des transitions encore plus fluides
    */
@@ -76,13 +57,6 @@ export function createGuidedTour(scene, spacecraftRef, cameraRef, onTourComplete
     return t < 0.5 
       ? 4 * t * t * t 
       : 1 - Math.pow(-2 * t + 2, 3) / 2
-  }
-  
-  /**
-   * Fonction d'easing smoothstep pour des transitions très douces
-   */
-  function smoothstep(t) {
-    return t * t * (3 - 2 * t)
   }
 
   /**

@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInfoCircle, faBolt, faCube, faGlobe, faEnvelope, faHeart, faMouse } from '@fortawesome/free-solid-svg-icons'
+import { faInfoCircle, faBolt, faCube, faGlobe, faEnvelope, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { faReact, faJsSquare, faCss3Alt, faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons'
 import '../styles/Footer.css'
 import logo from '../assets/logo.png'
