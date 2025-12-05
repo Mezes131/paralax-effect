@@ -43,6 +43,55 @@ To preview the production build:
 npm run preview
 ```
 
+## 🌐 Deployment to GitHub Pages
+
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+
+### Prerequisites
+
+1. A GitHub repository (create one if you don't have it)
+2. GitHub Pages enabled in your repository settings
+
+### Setup Steps
+
+1. **Push your code to GitHub**:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   git push -u origin main
+   ```
+
+2. **Enable GitHub Pages**:
+   - Go to your repository on GitHub
+   - Navigate to **Settings** → **Pages**
+   - Under **Source**, select **GitHub Actions**
+   - Save the settings
+
+3. **Automatic Deployment**:
+   - The workflow (`.github/workflows/deploy.yml`) will automatically:
+     - Build your project when you push to the `main` branch
+     - Deploy it to GitHub Pages
+   - After the first deployment, your site will be available at:
+     `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+
+4. **Manual Deployment**:
+   - You can also trigger a manual deployment by going to **Actions** → **Deploy to GitHub Pages** → **Run workflow**
+
+### Configuration Files
+
+- **`.github/workflows/deploy.yml`**: GitHub Actions workflow for automatic deployment
+- **`vite.config.js`**: Configured with dynamic base path for GitHub Pages
+- **`public/.nojekyll`**: Prevents Jekyll processing on GitHub Pages
+
+### Troubleshooting
+
+- If your site shows a 404 error, wait a few minutes for GitHub Pages to update
+- Check the **Actions** tab in your repository to see if the deployment succeeded
+- Ensure your repository name matches the base path in the workflow file
+
 ## 🎨 Technologies
 
 - **React 19** with hooks (useState, useEffect, useRef, useImperativeHandle)
