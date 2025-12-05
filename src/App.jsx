@@ -187,8 +187,7 @@ function App() {
       roughness: 0.1,
       metalness: 0.2,
       emissive: 0xff00ff,
-      emissiveIntensity: 0.6,
-      thickness: 0.3
+      emissiveIntensity: 0.6
     })
     const innerRing = new THREE.Mesh(innerRingGeometry, innerRingMaterial)
     innerRing.position.set(0, 0, 0)
