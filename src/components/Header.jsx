@@ -5,7 +5,7 @@ function Header({ isLoaded }) {
     <header className={`header ${isLoaded ? 'loaded' : ''}`}>
       <div className="header-content">
         <h1 className="title">PARALLAX EXPERIENCE</h1>
-        <p className="subtitle">Bougez la souris pour explorer</p>
+        <p className="subtitle">Move your mouse to explore</p>
       </div>
     </header>
   )

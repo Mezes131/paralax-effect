@@ -9,6 +9,7 @@ import { createAbstractComposition } from './components/AbstractComposition'
 import { createGiantBackground } from './components/GiantBackground'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import SidePanel from './components/SidePanel'
 import {
   createMouseMoveHandler,
   updateMousePosition,
@@ -30,7 +31,10 @@ function App() {
   const animationFrameRef = useRef(null)
   const lightsRef = useRef([])
   const isInitializedRef = useRef(false)
+  const isFullscreenRef = useRef(false)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isPanelExpanded, setIsPanelExpanded] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
     console.log('🔵 useEffect triggered')
@@ -111,7 +115,9 @@ function App() {
       alpha: true,
       powerPreference: "high-performance"
     })
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    const initialWidth = Math.min(window.innerWidth * 0.7, 1200)
+    const initialHeight = Math.min(window.innerHeight * 0.7, 800)
+    renderer.setSize(initialWidth, initialHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     renderer.shadowMap.enabled = true
@@ -119,6 +125,8 @@ function App() {
     renderer.domElement.style.display = 'block'
     renderer.domElement.style.width = '100%'
     renderer.domElement.style.height = '100%'
+    renderer.domElement.style.position = 'relative'
+    renderer.domElement.style.borderRadius = '20px'
     
     if (!mountRef.current) {
       isInitializedRef.current = false
@@ -156,10 +164,34 @@ function App() {
 
     // Gestion du redimensionnement
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight
+      // Utiliser une ref pour accéder à la valeur actuelle de isFullscreen
+      const fullscreen = isFullscreenRef.current || false
+      const width = fullscreen ? window.innerWidth : Math.min(window.innerWidth * 0.7, 1200)
+      const height = fullscreen ? window.innerHeight : Math.min(window.innerHeight * 0.7, 800)
+      
+      camera.aspect = width / height
       camera.updateProjectionMatrix()
-      renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.setSize(width, height)
+      
+      // Mettre à jour le canvas selon le mode
+      const canvas = renderer.domElement
+      if (!fullscreen) {
+        canvas.style.position = 'relative'
+        canvas.style.width = '100%'
+        canvas.style.height = '100%'
+        canvas.style.borderRadius = '20px'
+      } else {
+        canvas.style.position = 'absolute'
+        canvas.style.width = '100%'
+        canvas.style.height = '100%'
+        canvas.style.top = '0'
+        canvas.style.left = '0'
+        canvas.style.borderRadius = '0'
+      }
     }
+    
+    // Initialiser la taille
+    handleResize()
     window.addEventListener('resize', handleResize)
 
     // Gestion du mouvement de la souris
@@ -278,11 +310,79 @@ function App() {
     }
   }, [])
 
+  const handleTogglePanel = () => {
+    setIsPanelExpanded(!isPanelExpanded)
+  }
+
+  const handleToggleFullscreen = () => {
+    const newFullscreen = !isFullscreen
+    setIsFullscreen(newFullscreen)
+    isFullscreenRef.current = newFullscreen
+    
+    // Mettre à jour la taille du renderer
+    if (rendererRef.current && cameraRef.current) {
+      const width = newFullscreen ? window.innerWidth : Math.min(window.innerWidth * 0.7, 1200)
+      const height = newFullscreen ? window.innerHeight : Math.min(window.innerHeight * 0.7, 800)
+      
+      cameraRef.current.aspect = width / height
+      cameraRef.current.updateProjectionMatrix()
+      rendererRef.current.setSize(width, height)
+      
+      const canvas = rendererRef.current.domElement
+      if (newFullscreen) {
+        canvas.style.position = 'absolute'
+        canvas.style.width = '100%'
+        canvas.style.height = '100%'
+        canvas.style.top = '0'
+        canvas.style.left = '0'
+        canvas.style.borderRadius = '0'
+      } else {
+        canvas.style.position = 'relative'
+        canvas.style.width = '100%'
+        canvas.style.height = '100%'
+        canvas.style.borderRadius = '20px'
+      }
+    }
+  }
+
   return (
-    <div className="app-container">
-      <div ref={mountRef} className="canvas-container" />
-      <Header isLoaded={isLoaded} />
-      <Footer isLoaded={isLoaded} />
+    <div className={`app-container ${isFullscreen ? 'fullscreen' : ''}`}>
+      {!isFullscreen && <Header isLoaded={isLoaded} />}
+      
+      <div className="canvas-wrapper">
+        <div ref={mountRef} className={`canvas-container ${isFullscreen ? 'fullscreen' : ''}`}>
+          {!isFullscreen && (
+            <div className={`canvas-overlay ${isLoaded ? 'loaded' : ''}`}>
+              <h1 className="canvas-title">PARALLAX EXPERIENCE</h1>
+              <p className="canvas-subtitle">Move your mouse to explore</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {!isFullscreen && <Footer isLoaded={isLoaded} />}
+      
+      <SidePanel
+        isExpanded={isPanelExpanded}
+        onToggle={handleTogglePanel}
+        onFullscreen={handleToggleFullscreen}
+        isFullscreen={isFullscreen}
+      >
+        {{
+          controls: (
+            <div>
+              <p>Adjust parallax intensity and animation speed here.</p>
+            </div>
+          ),
+          info: (
+            <div>
+              <p><strong>Parallax Experience</strong></p>
+              <p>A 3D web experience showcasing dynamic parallax effects using React and Three.js.</p>
+              <p>Move your mouse to interact with the scene.</p>
+            </div>
+          )
+        }}
+      </SidePanel>
     </div>
   )
 }
