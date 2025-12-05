@@ -1,15 +1,19 @@
 # Parallax Experience - Awwwards Style
 
-Une expérience web interactive 3D avec effet parallaxe immersif, construite avec React et Three.js.
+An immersive 3D web experience with parallax effects, built with React and Three.js.
 
-## 🎯 Fonctionnalités
+## 🎯 Features
 
-- **Effet parallaxe 3D** : Plusieurs objets géométriques se déplacent à des vitesses différentes selon le mouvement de la souris
-- **5 objets géométriques** : Sphères, torus, cubes, octaèdres et cônes positionnés à différentes profondeurs
-- **Animation fluide** : Système de lerping (interpolation) pour des mouvements naturels
-- **Design moderne** : Dégradés sombres, matériaux néon, éclairage atmosphérique
-- **Responsive** : S'adapte automatiquement à la taille de la fenêtre
-- **Performance optimisée** : 60 FPS avec WebGL
+- **3D Parallax Effect**: Multiple geometric objects move at different speeds based on mouse movement
+- **Multiple 3D Compositions**: Portal, Crystals, Galaxy, Abstract, and StarField compositions positioned at different depths
+- **Interactive Spacecraft**: Navigable 3D spacecraft that can be controlled
+- **Guided Tour**: Automated tour system that showcases different compositions with smooth camera movements
+- **Smooth Animations**: Lerping (interpolation) system for natural movements
+- **Modern Design**: Dark gradients, neon materials, atmospheric lighting
+- **Fullscreen Mode**: Immersive fullscreen experience with dynamic canvas resizing
+- **Interactive UI**: Side panel with controls and information, navigation bar, and footer
+- **Responsive**: Automatically adapts to window size
+- **Optimized Performance**: 60 FPS with WebGL
 
 ## 🚀 Installation
 
@@ -17,13 +21,13 @@ Une expérience web interactive 3D avec effet parallaxe immersif, construite ave
 npm install
 ```
 
-## 💻 Développement
+## 💻 Development
 
 ```bash
 npm run dev
 ```
 
-Le projet sera accessible sur `http://localhost:5173`
+The project will be accessible at `http://localhost:5173`
 
 ## 🏗️ Build
 
@@ -31,44 +35,88 @@ Le projet sera accessible sur `http://localhost:5173`
 npm run build
 ```
 
+## 📦 Preview
+
+To preview the production build:
+
+```bash
+npm run preview
+```
+
 ## 🎨 Technologies
 
-- **React 19** avec hooks (useState, useEffect, useRef)
-- **Three.js r128** pour le rendu 3D
-- **Vite** pour le build et le développement
+- **React 19** with hooks (useState, useEffect, useRef, useImperativeHandle)
+- **Three.js r128** for 3D rendering
+- **Vite** for build and development
+- **Font Awesome** for icons
 
-## 📋 Spécifications techniques
+## 📋 Technical Specifications
 
-- Suivi de la souris normalisé (coordonnées -1 à 1)
-- Vitesses de parallaxe différentes pour chaque objet
-- Rotation continue des objets géométriques
-- 3 lumières ponctuelles colorées (magenta, cyan, jaune)
-- Matériaux MeshStandardMaterial avec émission néon
-- Animation d'entrée au chargement
-- Interface overlay avec titre et instructions
+- Normalized mouse tracking (coordinates -1 to 1)
+- Different parallax speeds for each object and composition
+- Continuous rotation of geometric objects
+- Multiple colored point lights (magenta, cyan, yellow)
+- MeshStandardMaterial with neon emission
+- Entrance animation on load
+- Overlay interface with title and instructions
+- 3D camera controls with rotation and panning
+- Inactivity detection for UI elements
+- Dynamic lighting animations
 
-## 🎭 Utilisation
+## 🎭 Usage
 
-Bougez simplement la souris pour explorer l'expérience 3D. Les objets proches bougent plus vite que les objets lointains, créant un effet de profondeur immersif.
+Simply move your mouse to explore the 3D experience. Objects closer to the camera move faster than distant objects, creating an immersive depth effect.
 
-## 📝 Structure du projet
+### Controls
+
+- **Mouse Movement**: Controls parallax effect and camera interaction
+- **Fullscreen Toggle**: Available in the side panel
+- **Guided Tour**: Automated tour through different compositions (if implemented)
+- **Side Panel**: Access controls and information about the project
+
+## 📝 Project Structure
 
 ```
 src/
-  ├── App.jsx      # Composant principal avec Three.js
-  ├── App.css      # Styles pour l'overlay et l'interface
-  └── index.css    # Styles globaux
+  ├── App.jsx                    # Main component with state management
+  ├── main.jsx                   # Application entry point
+  ├── components/
+  │   ├── ThreeScene.jsx        # Main Three.js scene component
+  │   ├── PortalComposition.jsx # Portal 3D composition
+  │   ├── CrystalsComposition.jsx # Crystals 3D composition
+  │   ├── GalaxyComposition.jsx # Galaxy 3D composition
+  │   ├── AbstractComposition.jsx # Abstract 3D composition
+  │   ├── StarFieldComposition.jsx # Star field background
+  │   ├── Spacecraft.jsx         # Interactive spacecraft component
+  │   ├── GuidedTour.jsx        # Automated tour system
+  │   ├── Lighting.jsx          # Lighting setup
+  │   ├── GiantBackground.jsx   # Background elements
+  │   ├── NavBar.jsx            # Navigation bar component
+  │   ├── Header.jsx            # Header component
+  │   ├── Footer.jsx            # Footer component
+  │   └── SidePanel.jsx         # Side panel with controls
+  ├── styles/
+  │   ├── App.css               # Main application styles
+  │   ├── index.css             # Global styles
+  │   ├── NavBar.css            # Navigation bar styles
+  │   ├── Footer.css            # Footer styles
+  │   ├── Header.css            # Header styles
+  │   └── SidePanel.css         # Side panel styles
+  └── utils/
+      └── parallax.js           # Parallax utility functions
 ```
 
-## 🎨 Personnalisation
+## 🎨 Customization
 
-Vous pouvez facilement modifier :
-- Les objets géométriques dans `objectsConfig`
-- Les couleurs et matériaux
-- Les vitesses de parallaxe
-- Les positions et profondeurs des objets
-- Les couleurs des lumières
+You can easily modify:
+- Geometric objects in composition components
+- Colors and materials
+- Parallax speeds in `utils/parallax.js`
+- Object positions and depths
+- Light colors in `components/Lighting.jsx`
+- Guided tour waypoints in `components/GuidedTour.jsx`
+- Camera settings and controls
 
-## 📄 Licence
+## 📄 License
 
-Ce projet est un exemple de démonstration.
+This project is a demonstration example.

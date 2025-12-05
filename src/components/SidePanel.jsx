@@ -92,6 +92,7 @@ const SidePanel = ({
                 Information
               </h3>
               {children?.info || <p>Project information will appear here.</p>}
+              
             </div>
           )}
           
@@ -104,16 +105,12 @@ const SidePanel = ({
               <div className="help-content">
                 <h4>Navigation</h4>
                 <ul>
-                  <li><strong>Mouse Movement</strong> : Control parallax effect</li>
-                  <li><strong>Fullscreen Mode</strong> : Click the expand button for immersive experience</li>
+                  <li><strong>Mouse Movement</strong> : Control parallax effect and interact with 3D objects</li>
+                  <li><strong>Fullscreen Mode</strong> : Click the expand button for an immersive experience</li>
+                  <li><strong>Guided Tour</strong> : Click the "Start" button in the top-right corner to begin an automated tour through all compositions</li>
+                  <li><strong>Side Panel</strong> : Toggle this panel to access controls, information, and help</li>
                 </ul>
                 
-                <h4>Parallax Effect</h4>
-                <ul>
-                  <li>Move your mouse to see objects react dynamically</li>
-                  <li>Different layers move at different speeds creating depth</li>
-                  <li>Objects rotate and respond to your cursor position</li>
-                </ul>
               </div>
             </div>
           )}
