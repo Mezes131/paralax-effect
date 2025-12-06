@@ -279,16 +279,11 @@
     width: 100%;
     max-width: 100%;
   }
-}
-
-@media (max-width: 480px) {
-  .side-panel.expanded {
-    width: 280px;
-  }
-
   .tab-button {
-    padding: 10px 12px;
+    padding: 8px;
     font-size: 0.85rem;
   }
 }
+
+
 

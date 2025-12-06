@@ -348,6 +348,9 @@
   .footer-bottom {
     margin-top: 25px;
   }
+  .logo-img {
+    height: 0.6rem; 
+  }
 }
 
 @media (max-width: 480px) {

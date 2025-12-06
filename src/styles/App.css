@@ -163,3 +163,28 @@
   }
 }
 
+@media (max-width: 768px) {
+  .canvas-container {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    height: calc(100vh - 200px);
+    border-radius: 15px;
+    border-width: 1px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  .canvas-overlay {
+    padding: 15px;
+    justify-content: center;
+  }
+  .canvas-title {
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    margin: 0 0 0.75rem 0;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+  .canvas-subtitle {
+    font-size: clamp(0.75rem, 3vw, 1rem);
+    letter-spacing: 0.1em;
+  }
+}
