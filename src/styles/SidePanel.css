@@ -271,14 +271,14 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .side-panel.expanded {
-    width: 300px;
+  .side-panel.fullscreen.expanded {
+    width: 20rem;
   }
 
-  .side-panel.fullscreen {
-    width: 100%;
-    max-width: 100%;
+  .side-panel.expanded {
+    width: 19rem;
   }
+
   .tab-button {
     padding: 8px;
     font-size: 0.85rem;
